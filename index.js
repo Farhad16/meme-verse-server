@@ -89,37 +89,11 @@ client.connect(err => {
 
 
   app.post('/api/upload-image', (req, res) => {
-    if (!req.files.file) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'req body cannot be empty',
+    const uploadData = req.body.uploadData;
+    memesCollection.insertOne(uploadData)
+      .then(result => {
+        return res.send(result.insertedCount > 0)
       });
-    }
-    const file = req.files.file;
-    const username = req.body.username;
-
-    const filePath = `${__dirname}/memes/${file.name}`;
-    file.mv(filePath, (err) => {
-
-      const newImg = fs.readFileSync(filePath);
-      const encImg = newImg.toString('base64');
-
-      const image = {
-        contentType: file.mimetype,
-        size: file.size,
-        img: Buffer.from(encImg, 'base64')
-      };
-
-      const memes = {
-        username,
-        image
-      };
-
-      memesCollection.insertOne(memes)
-        .then(result => {
-          return res.send(result.insertedCount > 0)
-        });
-    });
   });
 
   app.get('/api/memes', (req, res) => {
