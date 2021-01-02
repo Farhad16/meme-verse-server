@@ -35,7 +35,7 @@ client.connect(err => {
 
     if (!regex.test(password)) {
       res.send({
-        status: "Password should contain six characters, at least one number and one special characters",
+        status: "Password length must be 6 at least one numeric number, one character and one special characters",
         code: 1100,
       })
     }
@@ -65,7 +65,6 @@ client.connect(err => {
   app.post('/api/login', (req, res) => {
     const loginData = req.body.loginData;
     const { username, password } = loginData;
-    console.log(username, password);
     userCollection.find({ username: username, password: password })
       .toArray((err, user) => {
         if (user.length <= 0) {
@@ -80,7 +79,7 @@ client.connect(err => {
             username: username,
           }, JWT_SECRET)
           res.send({
-            status: 'Success fully logged in',
+            status: 'Successfully logged in',
             code: 200,
             token: token
           })
