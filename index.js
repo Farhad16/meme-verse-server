@@ -25,6 +25,7 @@ client.connect(err => {
   const userCollection = client.db(process.env.DB_NAME).collection("users");
   const memesCollection = client.db(process.env.DB_NAME).collection("memes");
   const commentsCollection = client.db(process.env.DB_NAME).collection("comments");
+  const likesCollection = client.db(process.env.DB_NAME).collection("likes");
 
   app.post('/api/register', (req, res) => {
     const registerData = req.body.registerData;
@@ -145,6 +146,46 @@ client.connect(err => {
       .toArray((err, comments) => {
         res.send(comments)
       })
+  })
+
+  app.post('/api/userLikes', (req, res) => {
+    const userLikes = req.body.userLikes;
+    const { username, _id } = userLikes;
+    likesCollection.find({ username: username, id: _id })
+      .toArray((err, likes) => {
+        if (likes.length > 0) {
+          res.send(likes[0])
+        }
+      })
+  })
+
+  app.post('/api/give-like', (req, res) => {
+    const likeData = req.body.likeData;
+    likesCollection.insertOne(likeData)
+      .then(result => {
+        if (result.insertedCount > 0) {
+          return res.send({ status: 200 })
+        }
+      });
+  })
+
+  app.get('/api/likes/:_id', (req, res) => {
+    const id = req.params._id;
+    likesCollection.find({ id: id })
+      .toArray((err, likes) => {
+        res.send(likes)
+      })
+  })
+
+  app.delete('/api/remove-like', (req, res) => {
+    const likeData = req.body.likeData;
+    const { username, id } = likeData;
+    likesCollection.deleteOne({ username: username, id: id })
+      .then(result => {
+        if (result.deletedCount > 0) {
+          return res.send({ status: 200 })
+        }
+      });
   })
 
   app.get('/', (req, res) => {
