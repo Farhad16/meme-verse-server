@@ -36,13 +36,13 @@ client.connect(err => {
     if (!regex.test(password)) {
       res.send({
         status: "Password length must be 6 at least one numeric number, one character and one special characters",
-        code: 1100,
+        code: 500,
       })
     }
     else if (password !== password1) {
       res.send({
         status: "Password not matched",
-        code: 1200,
+        code: 500,
       })
     } else {
       userCollection.find({ username: username })
@@ -50,7 +50,7 @@ client.connect(err => {
           if (document.length > 0) {
             res.send({
               status: "Username already exists",
-              code: 1300,
+              code: 500,
             })
           } else {
             userCollection.insertOne(registerInfo)
